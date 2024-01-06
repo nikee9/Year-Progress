@@ -5,6 +5,11 @@
     <div class="counters">
       <div class="counter">
         <span>Overall:</span>
+        <span>{{ secondYearProgress }}</span>
+      </div>
+
+      <div class="counter">
+        <span>Overall:</span>
         <progress id="months" :value="yearProgress" max="100"></progress>
       </div>
 
@@ -61,8 +66,10 @@ export default {
       totalDaysInYear: 365,
       totalHoursInYear: 0,
       totalMinutesInYear: 0,
+      totalSecondsInYear: 0,
       elapsedHoursInYear: 0,
       elapsedMinutesInYear: 0,
+      elapsedSecondsInYear: 0,
     };
   },
   methods: {
@@ -70,20 +77,21 @@ export default {
       this.currentSecondInMinute = new Date().getSeconds();
       let now = new Date();
       let delay = 1000 - now.getMilliseconds();
+      this.updateElapsedTimes();
       setTimeout(this.updateSecond, delay);
     },
     updateMinute() {
       this.currentMinuteInHour = new Date().getMinutes();
       let now = new Date();
       let delay = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
-      this.updateElapsedTimes();
+      // this.updateElapsedTimes();
       setTimeout(this.updateMinute, delay);
     },
     updateHour() {
       this.currentHour = new Date().getHours();
       let now = new Date();
       let delay = (60 - now.getMinutes()) * 60 * 1000 - now.getMilliseconds();
-      this.updateElapsedTimes();
+      // this.updateElapsedTimes();
       setTimeout(this.updateHour, delay);
     },
     updateDay() {
@@ -166,11 +174,18 @@ export default {
       let now = new Date();
       let startOfYear = new Date(now.getFullYear(), 0, 1);
       let diff = now - startOfYear;
+      this.elapsedSecondsInYear = Math.floor(diff / 1000);
       this.elapsedHoursInYear = Math.floor(diff / (1000 * 60 * 60));
       this.elapsedMinutesInYear = Math.floor(diff / (1000 * 60));
     },
+    calculateTotalSecondsInYear() {
+      this.totalSecondsInYear = this.totalDaysInYear * 24 * 60 * 60;
+    },
   },
   computed: {
+    secondYearProgress() {
+      return (this.elapsedSecondsInYear / this.totalSecondsInYear) * 100;
+    },
     secondProgress() {
       return Number((this.currentSecondInMinute / 60) * 100).toFixed(2);
     },
@@ -218,6 +233,7 @@ export default {
     this.updateYearDay();
     this.updateYear();
     this.updateElapsedTimes();
+    this.calculateTotalSecondsInYear();
   },
 };
 </script>
